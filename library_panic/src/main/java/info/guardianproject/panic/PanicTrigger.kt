@@ -7,8 +7,6 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import info.guardianproject.panic.Panic.isTriggerIntent
-import java.util.ArrayList
-import java.util.HashSet
 
 object PanicTrigger {
     const val TAG = "PanicTrigger"
@@ -25,10 +23,12 @@ object PanicTrigger {
      * @return whether an `ACTION_DISCONNECT Intent` was received
      */
     fun checkForConnectIntent(activity: Activity): Boolean {
-        val result = PanicUtils.checkForIntentWithAction(activity, Panic.ACTION_CONNECT)
-        val packageName = PanicUtils.getCallingPackageName(activity)
-        addConnectedResponder(activity, packageName)
-        return result
+        val isConnectAction = Panic.isConnectIntent(activity.intent)
+        if (isConnectAction) {
+            val packageName = PanicUtils.getCallingPackageName(activity)
+            addConnectedResponder(activity, packageName)
+        }
+        return isConnectAction
     }
 
     /**
@@ -41,10 +41,12 @@ object PanicTrigger {
      * @return whether an `ACTION_DISCONNECT Intent` was received
      */
     fun checkForDisconnectIntent(activity: Activity): Boolean {
-        val result = PanicUtils.checkForIntentWithAction(activity, Panic.ACTION_DISCONNECT)
-        val packageName = PanicUtils.getCallingPackageName(activity)
-        removeConnectedResponder(activity, packageName)
-        return result
+        val isDisconnectAction = Panic.isDisconnectIntent(activity.intent)
+        if (isDisconnectAction){
+            val packageName = PanicUtils.getCallingPackageName(activity)
+            removeConnectedResponder(activity, packageName)
+        }
+        return isDisconnectAction
     }
 
     /**
@@ -354,8 +356,17 @@ object PanicTrigger {
                 try {
                     ActivityCompat.startActivityForResult(context as Activity, intent, 0, null)
                 } catch (e: ClassCastException) {
-                    e.printStackTrace()
-                    Log.w(TAG, "sending trigger from Context, receivers cannot see sender packageName!")
+                    Log.w(TAG, "sending trigger from Context, receivers cannot see sender packageName!", e)
+                    // startActivityForResult() comes from Activity, so use an
+                    // alternate method of sending that Context supports. This
+                    // currently will send an Intent which the receiver will
+                    // not be able to verify which app sent it. That requires
+                    // including an IntentSender or some other hack like that
+                    // https://dev.guardianproject.info/issues/6260
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    ActivityCompat.startActivity(context, intent, null)
+                } catch (e: ActivityNotFoundException) {
+                    Log.w(TAG, "ActivityNotFoundException!", e)
                     // startActivityForResult() comes from Activity, so use an
                     // alternate method of sending that Context supports. This
                     // currently will send an Intent which the receiver will

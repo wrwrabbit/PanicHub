@@ -1,4 +1,7 @@
 <resources>
+
+    <string name="app_name">panic.hub</string>
+
     <string name="action_trigger">Trigger!</string>
     <string name="action_test_run">Test Run</string>
     <string name="test_dialog_title">PanicHub Test Run</string>
@@ -21,6 +24,8 @@
     <string name="service_description">service_description</string>
     <string name="tab_text_1">Responders</string>
     <string name="tab_text_2">Triggers</string>
-    <string name="app_name">panic.hub</string>
     <string name="alarm_sent">Alarm has been sent!</string>
+    <string name="title_activity_nav">NavActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_history">History</string>
 </resources>

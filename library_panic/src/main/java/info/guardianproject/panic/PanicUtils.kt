@@ -21,9 +21,9 @@ object PanicUtils {
         return packageName
     }
 
-    fun checkForIntentWithAction(activity: Activity, action: String?): Boolean {
+    fun checkForIntentWithAction(activity: Activity, action: String): Boolean {
         val intent = activity.intent ?: return false
-        return TextUtils.equals(intent.action, action)
+        return intent.action == action
     }
 
     fun throwNotTriggerIntent() {

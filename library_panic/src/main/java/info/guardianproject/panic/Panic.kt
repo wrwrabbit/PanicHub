@@ -19,4 +19,12 @@ object Panic {
     fun isTriggerIntent(intent: Intent?): Boolean {
         return intent != null && ACTION_TRIGGER == intent.action
     }
+
+    fun isConnectIntent(intent: Intent?): Boolean {
+        return intent != null && ACTION_CONNECT == intent.action
+    }
+
+    fun isDisconnectIntent(intent: Intent?): Boolean {
+        return intent != null && ACTION_DISCONNECT == intent.action
+    }
 }
