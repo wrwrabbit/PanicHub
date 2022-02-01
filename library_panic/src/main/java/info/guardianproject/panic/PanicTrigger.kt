@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import info.guardianproject.panic.Panic.isTriggerIntent
 import java.util.ArrayList
 import java.util.HashSet
@@ -268,7 +269,9 @@ object PanicTrigger {
         )
         val connectPackageNameList: MutableSet<String> = HashSet(connectInfos.size)
         for (resolveInfo in connectInfos) {
-            if (resolveInfo.activityInfo == null) continue
+            if (resolveInfo.activityInfo == null) {
+                continue
+            }
             connectPackageNameList.add(resolveInfo.activityInfo.packageName)
         }
         return connectPackageNameList
@@ -330,48 +333,59 @@ object PanicTrigger {
             PanicUtils.throwNotTriggerIntent()
         }
         val enabled = getEnabledResponders(context)
-        for (s in enabled) try {
+
+        val responderActivities = getResponderActivities(context)
+            .filter { item ->
+                enabled.contains(item)
+            }
+        val responderBroadcastReceivers = getResponderBroadcastReceivers(context)
+            .filter { item ->
+                enabled.contains(item)
+            }
+        val responderServices = getResponderServices(context)
+            .filter { item ->
+                enabled.contains(item)
+            }
+
+        try {
             //region start Activities
-            for (packageName in getResponderActivities(context)) {
-                if (enabled.contains(packageName)) {
-                    intent.setPackage(packageName)
-                    try {
-                        val activity = context as Activity
-                        activity.startActivityForResult(intent, 0)
-                    } catch (e: ClassCastException) {
-                        Log.w(TAG, "sending trigger from Context, receivers cannot see sender packageName!")
-                        // startActivityForResult() comes from Activity, so use an
-                        // alternate method of sending that Context supports. This
-                        // currently will send an Intent which the receiver will
-                        // not be able to verify which app sent it. That requires
-                        // including an IntentSender or some other hack like that
-                        // https://dev.guardianproject.info/issues/6260
-                        context.startActivity(intent)
-                    }
+            for (packageName in responderActivities) {
+                intent.setPackage(packageName)
+                try {
+                    ActivityCompat.startActivityForResult(context as Activity, intent, 0, null)
+                } catch (e: ClassCastException) {
+                    e.printStackTrace()
+                    Log.w(TAG, "sending trigger from Context, receivers cannot see sender packageName!")
+                    // startActivityForResult() comes from Activity, so use an
+                    // alternate method of sending that Context supports. This
+                    // currently will send an Intent which the receiver will
+                    // not be able to verify which app sent it. That requires
+                    // including an IntentSender or some other hack like that
+                    // https://dev.guardianproject.info/issues/6260
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    ActivityCompat.startActivity(context, intent, null)
                 }
             }
             //endregion
             //region start BroadcastReceivers
-            for (packageName in getResponderBroadcastReceivers(context)) {
-                if (enabled.contains(packageName)) {
-                    intent.setPackage(packageName)
-                    context.sendBroadcast(intent)
-                }
+            for (packageName in responderBroadcastReceivers) {
+                intent.setPackage(packageName)
+                context.sendBroadcast(intent)
             }
             //endregion
             //region start Services
-            for (packageName in getResponderServices(context)) {
-                if (enabled.contains(packageName)) {
+            for (packageName in responderServices) {
+                try {
                     intent.setPackage(packageName)
                     context.startForegroundService(intent)
+                } catch (e: SecurityException) {
+                    // if we don't have permission to start the Service
+                    e.printStackTrace()
                 }
             }
             //endregion
         } catch (e: ActivityNotFoundException) {
             // intent-filter without DEFAULT category makes the Activity be detected but not found
-            e.printStackTrace()
-        } catch (e: SecurityException) {
-            // if we don't have permission to start the Service
             e.printStackTrace()
         }
     }

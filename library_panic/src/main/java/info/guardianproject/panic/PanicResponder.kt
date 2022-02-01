@@ -4,18 +4,20 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences.Editor
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.preference.ListPreference
 import android.preference.PreferenceManager
-import android.text.TextUtils
 import info.guardianproject.panic.Panic.isTriggerIntent
 import java.io.File
 import java.util.ArrayList
 import java.util.HashSet
 
+
 object PanicResponder {
-    const val PREF_TRIGGER_PACKAGE_NAME = "panicResponderTriggerPackageName"
+    private const val PREF_TRIGGER_PACKAGE_NAME_SIZE = "panicResponderTriggerPackageNameSize"
+    private const val PREF_TRIGGER_PACKAGE_NAME_ITEM_ = "panicResponderTriggerPackageNameItem_"
 
     /**
      * Checks the provided [Activity] to see whether it has received a
@@ -43,7 +45,7 @@ object PanicResponder {
      * with [Activity.startActivityForResult]
      * @see .checkForDisconnectIntent
      */
-    fun getConnectIntentSender(activity: Activity): String? {
+    fun getConnectIntentSenderPackageName(activity: Activity): String? {
         return if (PanicUtils.checkForIntentWithAction(activity, Panic.ACTION_CONNECT)) {
             PanicUtils.getCallingPackageName(activity)
         } else null
@@ -70,15 +72,93 @@ object PanicResponder {
         var result = false
         if (PanicUtils.checkForIntentWithAction(activity, Panic.ACTION_DISCONNECT)) {
             result = true
-            if (TextUtils.equals(
-                    PanicUtils.getCallingPackageName(activity),
-                    getTriggerPackageName(activity)
-                )
-            ) {
-                setTriggerPackageName(activity, null)
+            val callingPackageName = PanicUtils.getCallingPackageName(activity)
+            val contains = isTriggerPackageNameListContains(activity, callingPackageName)
+            if (contains) {
+                removeTriggerPackageName(activity, callingPackageName)
             }
         }
         return result
+    }
+
+    fun isTriggerPackageNameListContains(activity: Activity, packageName: String?): Boolean {
+        packageName ?: return false
+        val triggerPackageNameList = getTriggerPackageNameList(activity)
+        return triggerPackageNameList.contains(packageName)
+    }
+
+    fun removeTriggerPackageName(activity: Activity, packageName: String?) {
+        if (packageName == null) {
+            return
+        }
+
+        val triggerPackageNameList = getTriggerPackageNameList(activity)
+        clearTriggerPackageNameList(activity)
+        val mutableList = triggerPackageNameList.toMutableList()
+        mutableList.remove(packageName)
+        saveTriggerPackageNameList(activity, mutableList)
+
+        val pm = activity.packageManager
+        val intent = Intent(Panic.ACTION_DISCONNECT)
+        intent.setPackage(packageName)
+        val resInfos = pm.queryIntentActivities(intent, 0)
+        if (resInfos.size > 0) {
+            activity.startActivityForResult(intent, 0)
+        }
+    }
+
+    /**
+     * Set the `packageName` as the currently configured panic trigger
+     * app. Set to `null` to have no panic trigger app active.
+     *
+     *
+     * When the user changes the panic app config, then the current app needs to
+     * send [Intent]s to the previous app, and the currently configured
+     * app to let them know about the changes. This is done by sending an
+     * `ACTION_DISCONNECT Intent` to the previous app, and an
+     * `ACTION_CONNECT Intent` to the newly configured app.
+     *
+     * @param activity    the current [Activity]
+     * @param packageName the app to set as the panic trigger
+     */
+    fun addTriggerPackageName(activity: Activity, packageName: String) {
+        val triggerPackageNameList = getTriggerPackageNameList(activity)
+        clearTriggerPackageNameList(activity)
+        val mutableList = triggerPackageNameList.toMutableList()
+        mutableList.add(packageName)
+        saveTriggerPackageNameList(activity, mutableList)
+
+        val pm = activity.packageManager
+        val intent = Intent(Panic.ACTION_CONNECT)
+        intent.setPackage(packageName)
+        val resInfos = pm.queryIntentActivities(intent, 0)
+        if (resInfos.size > 0) {
+            activity.startActivityForResult(intent, 0)
+        }
+    }
+
+    fun saveTriggerPackageNameList(context: Context, list: List<String>) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val editor = prefs.edit()
+        editor.putInt(PREF_TRIGGER_PACKAGE_NAME_SIZE, list.size);
+
+        for (i in list.indices) {
+            editor.putString("$PREF_TRIGGER_PACKAGE_NAME_ITEM_$i", list[i])
+        }
+
+        editor.apply()
+    }
+
+    fun clearTriggerPackageNameList(activity: Activity) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
+        val size = prefs.getInt(PREF_TRIGGER_PACKAGE_NAME_SIZE, 0)
+
+        val editor: Editor = prefs.edit()
+        for (i in 0 until size) {
+            editor.remove("$PREF_TRIGGER_PACKAGE_NAME_ITEM_$i")
+        }
+
+        editor.apply()
     }
 
     /**
@@ -88,9 +168,18 @@ object PanicResponder {
      * @param context the app's [Context]
      * @return the `packageName` or null
      */
-    fun getTriggerPackageName(context: Context?): String? {
+    fun getTriggerPackageNameList(context: Context): List<String> {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        return prefs.getString(PREF_TRIGGER_PACKAGE_NAME, null)
+        val list = mutableListOf<String>()
+        val size = prefs.getInt(PREF_TRIGGER_PACKAGE_NAME_SIZE, 0)
+
+        for (i in 0 until size) {
+            val element = prefs.getString("$PREF_TRIGGER_PACKAGE_NAME_ITEM_$i", null)
+            if (element != null) {
+                list.add(element)
+            }
+        }
+        return list
     }
 
     /**
@@ -117,52 +206,13 @@ object PanicResponder {
      * @param activity the [Activity] that received an
      * [Panic.ACTION_CONNECT] [Intent]
      */
-    fun setTriggerPackageName(activity: Activity) {
+    fun addCallingPackageNameAsTrigger(activity: Activity) {
         val intentPackageName = activity.intent.getPackage()
-        val callingPackageName = PanicUtils.getCallingPackageName(activity)
-        if (intentPackageName == null && callingPackageName == null) {
+        val callingPackageName = PanicUtils.getCallingPackageName(activity)?:return
+        if (intentPackageName == null) {
             // ignored
         } else {
-            setTriggerPackageName(activity, callingPackageName)
-        }
-    }
-
-    /**
-     * Set the `packageName` as the currently configured panic trigger
-     * app. Set to `null` to have no panic trigger app active.
-     *
-     *
-     * When the user changes the panic app config, then the current app needs to
-     * send [Intent]s to the previous app, and the currently configured
-     * app to let them know about the changes. This is done by sending an
-     * `ACTION_DISCONNECT Intent` to the previous app, and an
-     * `ACTION_CONNECT Intent` to the newly configured app.
-     *
-     * @param activity    the current [Activity]
-     * @param packageName the app to set as the panic trigger
-     */
-    fun setTriggerPackageName(activity: Activity, packageName: String?) {
-        val pm = activity.packageManager
-        val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
-        val existingPackageName = prefs.getString(PREF_TRIGGER_PACKAGE_NAME, null)
-        if (!existingPackageName.isNullOrEmpty()) {
-            val intent = Intent(Panic.ACTION_DISCONNECT)
-            intent.setPackage(existingPackageName)
-            val resInfos = pm.queryIntentActivities(intent, 0)
-            if (resInfos.size > 0) {
-                activity.startActivityForResult(intent, 0)
-            }
-        }
-        if (packageName.isNullOrEmpty() || packageName == Panic.PACKAGE_NAME_DEFAULT) {
-            prefs.edit().remove(PREF_TRIGGER_PACKAGE_NAME).apply()
-        } else {
-            prefs.edit().putString(PREF_TRIGGER_PACKAGE_NAME, packageName).apply()
-            val intent = Intent(Panic.ACTION_CONNECT)
-            intent.setPackage(packageName)
-            val resInfos = pm.queryIntentActivities(intent, 0)
-            if (resInfos.size > 0) {
-                activity.startActivityForResult(intent, 0)
-            }
+            addTriggerPackageName(activity, callingPackageName)
         }
     }
 
@@ -179,13 +229,21 @@ object PanicResponder {
          * panic trigger apps respond to ACTION_CONNECT, but only send
          * ACTION_TRIGGER, so they won't be resolved for ACTION_TRIGGER
          */
-        val connects = pm.queryIntentActivities(Intent(Panic.ACTION_CONNECT), 0)
-        if (connects.size == 0) return connects
+        val connects = pm.queryIntentActivities(PanicUtils.CONNECT_INTENT, 0)
+        if (connects.size == 0) {
+            return connects
+        }
         val triggerApps = ArrayList<ResolveInfo>(connects.size)
-        val triggers = pm.queryIntentActivities(Intent(Panic.ACTION_TRIGGER), 0)
+        val triggers = pm.queryIntentActivities(PanicUtils.TRIGGER_INTENT, 0)
         val haveTriggers = HashSet<String>(triggers.size)
-        for (resInfo in triggers) haveTriggers.add(resInfo.activityInfo.packageName)
-        for (connect in connects) if (!haveTriggers.contains(connect.activityInfo.packageName)) triggerApps.add(connect)
+        for (resInfo in triggers) {
+            haveTriggers.add(resInfo.activityInfo.packageName)
+        }
+        for (connect in connects) {
+            if (!haveTriggers.contains(connect.activityInfo.packageName)) {
+                triggerApps.add(connect)
+            }
+        }
         return triggerApps
     }
 
@@ -209,8 +267,8 @@ object PanicResponder {
             return false
         }
         val packageName = PanicUtils.getCallingPackageName(activity)
-        return (!TextUtils.isEmpty(packageName)
-                && TextUtils.equals(packageName, getTriggerPackageName(activity)))
+        return !packageName.isNullOrEmpty()
+                && isTriggerPackageNameListContains(activity, packageName)
     }
 
     /**
@@ -227,8 +285,8 @@ object PanicResponder {
             return false
         }
         val packageName = PanicUtils.getCallingPackageName(activity)
-        return (TextUtils.isEmpty(packageName)
-                || "DEFAULT" == packageName || packageName != getTriggerPackageName(activity))
+        return (packageName.isNullOrEmpty()
+                || "DEFAULT" == packageName || !isTriggerPackageNameListContains(activity, packageName))
     }
 
     /**
@@ -246,30 +304,35 @@ object PanicResponder {
         noneSummaryResid: Int
     ) {
         val context = listPreference.context
-        val triggerPackageName = getTriggerPackageName(context)
-        if (TextUtils.isEmpty(triggerPackageName)
-            || triggerPackageName == Panic.PACKAGE_NAME_DEFAULT
-        ) {
-            listPreference.value = Panic.PACKAGE_NAME_DEFAULT
-            listPreference.setDefaultValue(Panic.PACKAGE_NAME_DEFAULT)
-            listPreference.setSummary(defaultSummaryResid)
-            listPreference.icon = null
-        } else {
-            listPreference.value = triggerPackageName
-            listPreference.setDefaultValue(triggerPackageName)
-            if (triggerPackageName == Panic.PACKAGE_NAME_NONE) {
-                listPreference.setSummary(noneSummaryResid)
-                listPreference.setIcon(android.R.drawable.ic_menu_close_clear_cancel)
+        val triggerPackageNameList = getTriggerPackageNameList(context).toMutableList()
+        if (triggerPackageNameList.isEmpty()) {
+            triggerPackageNameList.add(Panic.PACKAGE_NAME_DEFAULT)
+        }
+        for (triggerPackageName in triggerPackageNameList) {
+            if (triggerPackageName.isEmpty()
+                || triggerPackageName == Panic.PACKAGE_NAME_DEFAULT
+            ) {
+                listPreference.value = Panic.PACKAGE_NAME_DEFAULT
+                listPreference.setDefaultValue(Panic.PACKAGE_NAME_DEFAULT)
+                listPreference.setSummary(defaultSummaryResid)
+                listPreference.icon = null
             } else {
-                try {
-                    val pm = context.packageManager
-                    listPreference.summary = pm.getApplicationLabel(
-                        pm.getApplicationInfo(triggerPackageName!!, 0)
-                    )
-                    listPreference.icon = pm.getApplicationIcon(triggerPackageName)
-                } catch (e: PackageManager.NameNotFoundException) {
-                    listPreference.setSummary(defaultSummaryResid)
-                    listPreference.icon = null
+                listPreference.value = triggerPackageName
+                listPreference.setDefaultValue(triggerPackageName)
+                if (triggerPackageName == Panic.PACKAGE_NAME_NONE) {
+                    listPreference.setSummary(noneSummaryResid)
+                    listPreference.setIcon(android.R.drawable.ic_menu_close_clear_cancel)
+                } else {
+                    try {
+                        val pm = context.packageManager
+                        listPreference.summary = pm.getApplicationLabel(
+                            pm.getApplicationInfo(triggerPackageName!!, 0)
+                        )
+                        listPreference.icon = pm.getApplicationIcon(triggerPackageName)
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        listPreference.setSummary(defaultSummaryResid)
+                        listPreference.icon = null
+                    }
                 }
             }
         }

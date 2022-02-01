@@ -3,7 +3,6 @@ package com.panic.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -13,11 +12,16 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleService
 import com.panic.BuildConfig
 import com.panic.R
 import com.panic.ext.printData
+import com.panic.ext.toastLong
+import info.guardianproject.panic.Panic
+import info.guardianproject.panic.PanicTrigger
+import info.guardianproject.panic.PanicUtils
 
-class PanicService : Service() {
+class PanicService : LifecycleService() {
 
     private val context: Context by lazy {
         this
@@ -30,7 +34,6 @@ class PanicService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "onCreate: ")
-        startForeground(NOTIFICATION_ID, buildNotification())
     }
 
     private fun buildNotification(): Notification {
@@ -70,15 +73,23 @@ class PanicService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground(NOTIFICATION_ID, buildNotification())
+        if (!Panic.isTriggerIntent(intent)) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+            return super.onStartCommand(intent, flags, startId)
+        }
+
         Log.d(TAG, "onStartCommand:")
         intent?.extras?.printData(TAG)
-        Toast.makeText(this, "onStartCommand at ${PanicService::class.qualifiedName}", Toast.LENGTH_SHORT).show()
+        PanicTrigger.sendTrigger(this)
+        toastLong("${getString(R.string.app_name)} onStartCommand!")
 
         stopForeground(STOP_FOREGROUND_REMOVE)
         return super.onStartCommand(intent, flags, startId)
     }
 
-    override fun onBind(p0: Intent?): IBinder? {
+    override fun onBind(p0: Intent): IBinder? {
+        super.onBind(p0)
         return null
     }
 

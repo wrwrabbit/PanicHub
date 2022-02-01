@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">handler.panic</string>
+    <string name="service_name">service_name</string>
+    <string name="service_description">service_description</string>
+</resources>

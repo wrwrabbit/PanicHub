@@ -4,12 +4,13 @@ plugins {
 }
 
 android {
-    compileSdk 31
+
+    compileSdkVersion androidCompileSdkVersion
 
     defaultConfig {
-        applicationId "com.panic"
-        minSdk 24
-        targetSdk 31
+        applicationId "com.panic.hub"
+        minSdkVersion androidMinSdkVersion
+        targetSdkVersion androidTargetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -32,15 +33,23 @@ android {
     buildFeatures {
         viewBinding true
     }
+
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
+
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
-    implementation 'info.guardianproject.panic:panic:1.0'
+
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
+    implementation 'androidx.lifecycle:lifecycle-service:2.4.0'
+
+    implementation project(":module_domain")
+    implementation project(":library_panic")
 }

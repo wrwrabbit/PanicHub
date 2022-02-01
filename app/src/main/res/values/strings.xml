@@ -1,8 +1,26 @@
 <resources>
-    <string name="app_name">PanicExample</string>
-    <string name="title_activity_main2">MainActivity2</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
-    <string name="service_name">App Service</string>
-    <string name="service_description">App Service Description</string>
+    <string name="action_trigger">Trigger!</string>
+    <string name="action_test_run">Test Run</string>
+    <string name="test_dialog_title">PanicHub Test Run</string>
+
+    <string name="responders">PanicHub Responders</string>
+
+    <string name="swipe_down_to_trigger">Swipe down to trigger</string>
+    <string name="release_to_confirm">Release to confirm</string>
+    <string name="panic_test_successful">Good job! In a real scenario, your trigger would have PanicHubd out to all of the responder apps.  And those apps would then respond by locking or whatever other behaviors you have configured.</string>
+    <string name="intro_instructions">When you trigger a PanicHub, your chosen apps react.  Tap EDIT to see and change that app\'s behaviors.</string>
+
+    <string name="tap_anywhere_to_cancel">Tap anywhere to cancel</string>
+    <string name="tap_to_trigger">Tap to trigger a PanicHub</string>
+    <string name="only_a_test">This is only a test</string>
+    <string name="done">Done</string>
+    <string name="edit">Edit</string>
+    <string name="got_it">Got it</string>
+    <string name="app_hides">App hides when triggered</string>
+    <string name="service_name">service_name</string>
+    <string name="service_description">service_description</string>
+    <string name="tab_text_1">Responders</string>
+    <string name="tab_text_2">Triggers</string>
+    <string name="app_name">panic.hub</string>
+    <string name="alarm_sent">Alarm has been sent!</string>
 </resources>

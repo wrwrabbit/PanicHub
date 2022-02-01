@@ -3,12 +3,12 @@
     package="com.panic">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="com.panic.handler.BIND_PANIC_HANDLER_SERVICE" />
 
     <permission
-        android:name="com.panic.BIND_PANIC_SERVICE"
+        android:name="com.panic.handler.BIND_PANIC_HANDLER_SERVICE"
         android:label="my_permission"
-        android:protectionLevel="normal"
-        />
+        android:protectionLevel="normal" />
 
     <application
         android:allowBackup="true"
@@ -18,12 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PanicExample">
         <activity
-            android:name=".ui.main.MainActivity2"
-            android:exported="false"
-            android:label="@string/title_activity_main2"
-            android:theme="@style/Theme.PanicExample.NoActionBar" />
+            android:name=".ui.alarm.AlarmActivity"
+            android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,8 +38,8 @@
 
         <service
             android:name=".service.PanicService"
-            android:permission="com.panic.BIND_PANIC_SERVICE"
-            android:exported="true">
+            android:exported="true"
+            android:permission="com.panic.hub.BIND_PANIC_HUB_SERVICE">
             <intent-filter>
                 <action android:name="info.guardianproject.panic.action.TRIGGER" />
             </intent-filter>

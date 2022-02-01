@@ -9,3 +9,5 @@ dependencyResolutionManagement {
 rootProject.name = "PanicExample"
 include ':app'
 include ':library_panic'
+include ':module_domain'
+include ':example_handler'

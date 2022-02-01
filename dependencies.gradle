@@ -1,0 +1,10 @@
+ext {
+    androidBuildToolsVersion = "30.0.2"
+    androidMinSdkVersion = 26
+    androidTargetSdkVersion = 31
+    androidCompileSdkVersion = 31
+    androidRenderscriptTargetApi = 26
+
+    kotlin_version = '1.6.10'
+
+}
