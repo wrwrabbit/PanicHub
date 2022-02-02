@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge tools:parentTag="androidx.appcompat.widget.LinearLayoutCompat"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="@dimen/app_default_16dp"
+    android:paddingTop="@dimen/app_default_8dp"
+    android:paddingBottom="@dimen/app_default_8dp"
+    android:paddingEnd="@dimen/app_default_16dp"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/titleView"
+        android:layout_width="match_parent"
+        tools:text="titleView"
+        android:layout_height="wrap_content"/>
+
+</merge>

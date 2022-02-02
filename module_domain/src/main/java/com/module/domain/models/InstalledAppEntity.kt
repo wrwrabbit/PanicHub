@@ -1,8 +1,8 @@
-package com.module.domain
+package com.module.domain.models
 
 import android.graphics.drawable.Drawable
 
-data class InstalledApp(
+data class InstalledAppEntity(
     val packageName: String,
     val label: String,
     val icon: Drawable,

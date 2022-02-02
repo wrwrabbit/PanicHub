@@ -7,7 +7,7 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
-import com.module.domain.InstalledApp
+import com.module.domain.models.InstalledAppEntity
 import com.panic.R
 import com.panic.databinding.InstalledAppViewBinding
 
@@ -15,8 +15,8 @@ class InstalledAppView constructor(context: Context) : RelativeLayout(context) {
 
     private val binding = InstalledAppViewBinding.inflate(LayoutInflater.from(context), this)
 
-    var onClickListener: ((InstalledApp) -> Unit)? = null
-    var onSwitchEnableListener: ((InstalledApp, Boolean) -> Unit)? = null
+    var onClickListener: ((InstalledAppEntity) -> Unit)? = null
+    var onSwitchEnableListener: ((InstalledAppEntity, Boolean) -> Unit)? = null
     private var rowPackageName: String? = null
     override fun setEnabled(enabled: Boolean) {
         if (enabled) {
@@ -36,7 +36,7 @@ class InstalledAppView constructor(context: Context) : RelativeLayout(context) {
         }
     }
 
-    fun setupForApp(item: InstalledApp) {
+    fun setupForApp(item: InstalledAppEntity) {
         rowPackageName = item.packageName
         binding.iconView.setImageDrawable(item.icon)
         binding.appLabel.text = item.label

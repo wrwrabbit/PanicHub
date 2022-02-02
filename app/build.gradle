@@ -51,7 +51,20 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-service:2.4.0'
 
     implementation project(":module_domain")
+    implementation project(":module_data")
+    implementation project(":module_database")
     implementation project(":library_panic")
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+
+    //region Koin
+    // Koin main features for Android (Scope,ViewModel ...)
+    implementation "io.insert-koin:koin-android:$koin_version"
+    // Koin Java Compatibility
+    implementation "io.insert-koin:koin-android-compat:$koin_version"
+    // Koin for Jetpack WorkManager
+    implementation "io.insert-koin:koin-androidx-workmanager:$koin_version"
+    // Koin for Jetpack Compose
+    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
+    //endregion
 }

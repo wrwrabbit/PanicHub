@@ -5,17 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.tabs.TabLayoutMediator
 import com.panic.R
 import com.panic.databinding.FragmentHomeBinding
 import com.panic.ext.snackbar
-import com.panic.ui.main.MainActivity
 import com.panic.ui.home.pages.Tabs
 import com.panic.ui.home.pages.adapter.SectionsPagerAdapter
 import info.guardianproject.panic.PanicTrigger
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : Fragment() {
 
@@ -25,16 +23,15 @@ class HomeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
+    private val viewModel: HomeViewModel by viewModel()
+
     private lateinit var sectionsPagerAdapter: SectionsPagerAdapter
 
-    lateinit var viewModel: HomeViewModel
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        viewModel =
-            ViewModelProvider(this)[HomeViewModel::class.java]
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -55,9 +52,7 @@ class HomeFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == AppCompatActivity.RESULT_OK && requestCode == MainActivity.CONNECT_RESULT) {
-            sectionsPagerAdapter.onActivityResult(requestCode, resultCode, data)
-        }
+        sectionsPagerAdapter.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun onDestroyView() {

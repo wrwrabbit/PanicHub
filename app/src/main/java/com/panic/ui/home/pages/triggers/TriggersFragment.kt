@@ -60,9 +60,9 @@ class TriggersFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pageViewModel.list.observe(viewLifecycleOwner, {
+        pageViewModel.list.observe(viewLifecycleOwner) {
             adapter.setList(it)
-        })
+        }
 
         binding.recyclerView.addItemDecoration(SimpleDividerItemDecoration(requireContext()))
         binding.recyclerView.setHasFixedSize(true) // does not change, except in onResume()

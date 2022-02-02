@@ -13,7 +13,7 @@ abstract class BaseFragmentPagerAdapter constructor(
     private val registeredFragments = SparseArray<WeakReference<Fragment>>()
 
     fun getRegisteredFragment(position: Int): Fragment {
-        return registeredFragments.get(position).get() ?: addFragment(createFragment(position))
+        return registeredFragments.get(position)?.get() ?: addFragment(createFragment(position))
     }
 
     fun getItem(position: Int): Fragment {

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import info.guardianproject.panic.Panic.isTriggerIntent
@@ -42,7 +43,7 @@ object PanicTrigger {
      */
     fun checkForDisconnectIntent(activity: Activity): Boolean {
         val isDisconnectAction = Panic.isDisconnectIntent(activity.intent)
-        if (isDisconnectAction){
+        if (isDisconnectAction) {
             val packageName = PanicUtils.getCallingPackageName(activity)
             removeConnectedResponder(activity, packageName)
         }
@@ -278,6 +279,12 @@ object PanicTrigger {
         }
         return connectPackageNameList
     }
+
+    fun sendTriggerWithExtras(context: Context, intent: Intent = PanicUtils.TRIGGER_INTENT, extras: Bundle?) {
+        extras?.let { intent.putExtras(it) }
+        sendTrigger(context, intent)
+    }
+
     /**
      * Send the [Intent] to all configured panic receivers.  It must have
      * an `action` of [Panic.ACTION_TRIGGER] or a
@@ -302,31 +309,6 @@ object PanicTrigger {
      * If this is an instance of `Activity`, then the receiving
      * apps will be able to verify which app sent the `Intent`
      * @param intent  the `Intent` to send to panic responders
-     * @throws IllegalArgumentException if not a [Panic.ACTION_TRIGGER]
-     * `Intent`
-     */
-    /**
-     * Send a basic [Panic.ACTION_TRIGGER] [Intent] to all
-     * configured panic receivers.  See [.sendTrigger]
-     * if you want to use a custom `Intent` that can include things
-     * like a text message, email addresses, phone numbers, etc.
-     *
-     *
-     * Only the receiving `Activity`s will be able to verify which app sent this,
-     * [android.app.Service]s and [android.content.BroadcastReceiver]s
-     * will not.
-     *
-     *
-     * **WARNING**: If the receiving apps must be able to verify
-     * which app sent this `Intent`, then `context` **must** be
-     * an instance of [Activity]. Also, that `Activity` cannot have
-     * `android:launchMode="singleInstance"` (because it is not possible
-     * to get the calling `Activity`, as set by
-     * [Activity.startActivityForResult])
-     *
-     * @param context the `Context` that will send the trigger `Intent`,
-     * If this is an instance of `Activity`, then the receiving
-     * apps will be able to verify which app sent the `Intent`
      * @throws IllegalArgumentException if not a [Panic.ACTION_TRIGGER]
      * `Intent`
      */

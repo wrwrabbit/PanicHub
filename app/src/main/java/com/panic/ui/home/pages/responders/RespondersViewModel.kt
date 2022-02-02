@@ -5,17 +5,17 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.module.domain.InstalledApp
+import com.module.domain.models.InstalledAppEntity
 import info.guardianproject.panic.PanicTrigger
 
-class RespondersViewModel(application: Application) : AndroidViewModel(application) {
+class RespondersViewModel constructor(application: Application) : AndroidViewModel(application) {
 
     private val _index = MutableLiveData<Int>()
-    private val _list = MutableLiveData<List<InstalledApp>>()
+    private val _list = MutableLiveData<List<InstalledAppEntity>>()
     val text: LiveData<String> = Transformations.map(_index) {
         "Hello world from section: $it"
     }
-    val list: LiveData<List<InstalledApp>> get() = _list
+    val list: LiveData<List<InstalledAppEntity>> get() = _list
 
     fun setIndex(index: Int) {
         _index.value = index
@@ -38,7 +38,7 @@ class RespondersViewModel(application: Application) : AndroidViewModel(applicati
             .map { packageName ->
                 val applicationLabel = pm.getApplicationLabel(pm.getApplicationInfo(packageName, 0))
                 val applicationIcon = pm.getApplicationIcon(packageName)
-                InstalledApp(
+                InstalledAppEntity(
                     packageName = packageName,
                     label = applicationLabel.toString(),
                     icon = applicationIcon,

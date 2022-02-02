@@ -25,7 +25,6 @@
     <string name="tab_text_1">Responders</string>
     <string name="tab_text_2">Triggers</string>
     <string name="alarm_sent">Alarm has been sent!</string>
-    <string name="title_activity_nav">NavActivity</string>
     <string name="title_home">Home</string>
     <string name="title_history">History</string>
 </resources>

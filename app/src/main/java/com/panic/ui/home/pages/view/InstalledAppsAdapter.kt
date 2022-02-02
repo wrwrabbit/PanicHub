@@ -3,14 +3,14 @@ package com.panic.ui.home.pages.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.module.domain.InstalledApp
+import com.module.domain.models.InstalledAppEntity
 
 internal class InstalledAppsAdapter constructor(
 ) : RecyclerView.Adapter<InstalledAppsAdapter.AppRowHolder>() {
 
-    val appLabelList = mutableListOf<InstalledApp>()
-    var onClickListener: ((InstalledApp)->Unit)? = null
-    var onSwitchEnableListener: ((InstalledApp, Boolean) -> Unit)? = null
+    val appLabelList = mutableListOf<InstalledAppEntity>()
+    var onClickListener: ((InstalledAppEntity)->Unit)? = null
+    var onSwitchEnableListener: ((InstalledAppEntity, Boolean) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppRowHolder {
         return AppRowHolder(InstalledAppView(parent.context))
@@ -29,7 +29,7 @@ internal class InstalledAppsAdapter constructor(
         return appLabelList.size
     }
 
-    fun setList(it: List<InstalledApp>) {
+    fun setList(it: List<InstalledAppEntity>) {
         appLabelList.clear()
         appLabelList.addAll(it)
         notifyDataSetChanged()

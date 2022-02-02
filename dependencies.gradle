@@ -6,5 +6,7 @@ ext {
     androidRenderscriptTargetApi = 26
 
     kotlin_version = '1.6.10'
-
+    room_version = '2.4.1'/*https://mvnrepository.com/artifact/androidx.room/room-runtime*/
+    koin_version = "3.1.5"/*https://mvnrepository.com/artifact/io.insert-koin/koin-android*/
+    kotlinx_coroutines_android = "1.6.0"/*https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-android*/
 }
