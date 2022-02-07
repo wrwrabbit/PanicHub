@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ripple</string>
+
     <string name="action_trigger">Fillo!</string>
     <string name="action_test_run">Provo</string>
     <string name="test_dialog_title">Ripple Provo</string>

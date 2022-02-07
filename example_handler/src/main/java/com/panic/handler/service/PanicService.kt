@@ -70,9 +70,9 @@ class PanicService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(NOTIFICATION_ID, buildNotification())
-        Log.d(TAG, "onStartCommand:")
+        Log.d(TAG, "${getString(R.string.app_name)} Service onStartCommand:")
         PanicTrigger.sendTrigger(this)
-        toastLong("${getString(R.string.app_name)} onStartCommand!")
+        toastLong("${getString(R.string.app_name)} Service onStartCommand!")
 
         stopForeground(STOP_FOREGROUND_REMOVE)
         return super.onStartCommand(intent, flags, startId)

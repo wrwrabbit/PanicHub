@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Ripple</string>
+
     <string name="action_trigger">Acionar!</string>
     <string name="action_test_run">Testar</string>
     <string name="test_dialog_title">Teste do Ripple</string>

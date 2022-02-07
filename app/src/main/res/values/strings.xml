@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">panic.hub</string>
+    <string name="app_name">Hub</string>
 
     <string name="action_trigger">Trigger!</string>
     <string name="action_test_run">Test Run</string>

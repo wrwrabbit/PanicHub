@@ -3,6 +3,13 @@
     package="com.panic">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="com.panic.handler.BIND_PANIC_HANDLER_SERVICE" />
+
+    <permission
+        android:name="com.panic.handler.BIND_PANIC_HANDLER_SERVICE"
+        android:label="my_permission"
+        android:protectionLevel="normal"
+        />
 
     <application
         android:name=".TheApplication"
@@ -33,15 +40,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".service.PanicService"
-            android:exported="true"
-            android:permission="com.panic.hub.BIND_PANIC_HUB_SERVICE">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="info.guardianproject.panic.action.TRIGGER" /> -->
-            <!-- </intent-filter> -->
-        </service>
     </application>
 
 </manifest>

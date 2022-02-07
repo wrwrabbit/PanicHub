@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Ripple</string>
+    <string name="app_name">Alarm</string>
 
     <string name="action_trigger">Trigger!</string>
     <string name="action_test_run">Test Run</string>

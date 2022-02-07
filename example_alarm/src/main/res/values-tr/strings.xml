@@ -15,5 +15,5 @@
     <string name="test_dialog_title">Ripple Test Sürüşü</string>
     <string name="action_test_run">Test Sürüşü</string>
     <string name="action_trigger">Tetikle!</string>
-    <string name="app_name">Ripple</string>
+
 </resources>
