@@ -6,6 +6,8 @@ plugins {
 android {
     compileSdkVersion androidCompileSdkVersion
 
+    flavorDimensions "first"
+
     defaultConfig {
         applicationId "com.panic.handler"
         minSdkVersion androidMinSdkVersion
@@ -14,6 +16,10 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        viewBinding true/*https://developer.android.com/topic/libraries/view-binding#setup*/
     }
 
     buildTypes {
@@ -28,6 +34,15 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    productFlavors {
+        first {
+            applicationId "${applicationId}.first"
+        }
+        second {
+            applicationId "${applicationId}.second"
+        }
     }
 }
 

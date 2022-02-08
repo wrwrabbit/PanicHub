@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Handler</string>
     <string name="service_name">service_name</string>
     <string name="service_description">service_description</string>
 </resources>

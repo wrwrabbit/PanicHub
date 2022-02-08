@@ -25,16 +25,22 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
 
-        <service
-            android:name=".service.PanicService"
-            android:permission="com.panic.handler.BIND_PANIC_HANDLER_SERVICE"
-            android:exported="true">
             <intent-filter>
                 <action android:name="info.guardianproject.panic.action.TRIGGER" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </service>
+        </activity>
+
+<!--        <service-->
+<!--            android:name=".service.PanicService"-->
+<!--            android:permission="com.panic.handler.BIND_PANIC_HANDLER_SERVICE"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="info.guardianproject.panic.action.TRIGGER" />-->
+<!--            </intent-filter>-->
+<!--        </service>-->
 
         <receiver android:name=".broadcast.PanicBroadcast"
             android:exported="true"

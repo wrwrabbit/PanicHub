@@ -6,8 +6,18 @@ import android.text.TextUtils
 import android.util.Log
 
 object PanicUtils {
-    val TRIGGER_INTENT = Intent(Panic.ACTION_TRIGGER)
-    val CONNECT_INTENT = Intent(Panic.ACTION_CONNECT)
+    fun buildTriggerIntent(): Intent {
+        return Intent(Panic.ACTION_TRIGGER)
+    }
+
+    fun buildConnectIntent(): Intent {
+        return Intent(Panic.ACTION_CONNECT)
+    }
+
+    fun buildDisconnectIntent(): Intent {
+        return Intent(Panic.ACTION_DISCONNECT)
+    }
+
     fun getCallingPackageName(activity: Activity): String? {
         // getCallingPackage() was unstable until android-18, use this
         val componentName = activity.callingActivity ?: return null

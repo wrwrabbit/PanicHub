@@ -17,6 +17,7 @@ import com.panic.ui.main.MainViewModel
 import com.panic.ui.utils.SimpleDividerItemDecoration
 import info.guardianproject.panic.Panic
 import info.guardianproject.panic.PanicTrigger
+import info.guardianproject.panic.PanicUtils
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 /**
@@ -34,7 +35,7 @@ class RespondersFragment : BaseFragment() {
 
     private val adapter = InstalledAppsAdapter().apply {
         onClickListener = { installedApp ->
-            val intent = Intent(Panic.ACTION_CONNECT)
+            val intent = PanicUtils.buildConnectIntent()
             intent.setPackage(installedApp.packageName)
             intent.putExtra(MainActivity.CONNECT_PACKAGE_NAME, installedApp.packageName)
             // TODO add TrustedIntents here

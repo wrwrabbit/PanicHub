@@ -4,9 +4,6 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion androidCompileSdkVersion
 
-    aaptOptions {
-        cruncherEnabled = false
-    }
 
     defaultConfig {
         applicationId "info.guardianproject.ripple"
@@ -35,19 +32,17 @@ android {
         jvmTarget = '1.8'
     }
 
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError true
-
-        htmlReport true
-        xmlReport false
-        textReport false
-
-        lintConfig file("lint.xml")
-    }
 
     buildFeatures {
         viewBinding true
+    }
+    lint {
+        abortOnError true
+        checkReleaseBuilds false
+        htmlReport true
+        lintConfig file('lint.xml')
+        textReport false
+        xmlReport false
     }
 }
 

@@ -99,7 +99,7 @@ object PanicResponder {
         saveTriggerPackageNameList(activity, mutableList)
 
         val pm = activity.packageManager
-        val intent = Intent(Panic.ACTION_DISCONNECT)
+        val intent = PanicUtils.buildDisconnectIntent()
         intent.setPackage(packageName)
         val resInfos = pm.queryIntentActivities(intent, 0)
         if (resInfos.size > 0) {
@@ -129,7 +129,7 @@ object PanicResponder {
         saveTriggerPackageNameList(activity, mutableList)
 
         val pm = activity.packageManager
-        val intent = Intent(Panic.ACTION_CONNECT)
+        val intent = PanicUtils.buildConnectIntent()
         intent.setPackage(packageName)
         val resInfos = pm.queryIntentActivities(intent, 0)
         if (resInfos.size > 0) {
@@ -229,12 +229,12 @@ object PanicResponder {
          * panic trigger apps respond to ACTION_CONNECT, but only send
          * ACTION_TRIGGER, so they won't be resolved for ACTION_TRIGGER
          */
-        val connects = pm.queryIntentActivities(PanicUtils.CONNECT_INTENT, 0)
+        val connects = pm.queryIntentActivities(PanicUtils.buildConnectIntent(), 0)
         if (connects.size == 0) {
             return connects
         }
         val triggerApps = ArrayList<ResolveInfo>(connects.size)
-        val triggers = pm.queryIntentActivities(PanicUtils.TRIGGER_INTENT, 0)
+        val triggers = pm.queryIntentActivities(PanicUtils.buildTriggerIntent(), 0)
         val haveTriggers = HashSet<String>(triggers.size)
         for (resInfo in triggers) {
             haveTriggers.add(resInfo.activityInfo.packageName)
