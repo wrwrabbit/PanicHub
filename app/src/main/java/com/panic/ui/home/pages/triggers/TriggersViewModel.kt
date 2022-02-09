@@ -25,15 +25,16 @@ class TriggersViewModel(application:Application) : BaseViewModel(application) {
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
-        getAllRespondersList()
+        getAllTriggersList()
     }
 
-    private fun getAllRespondersList() {
-        val enabledResponders = PanicResponder.getTriggerPackageNameList(getApplication())
+    private fun getAllTriggersList() {
+        val allTriggers = PanicTrigger.getTriggerApps(getApplication())
+        val enabledResponders = PanicResponder.getEnabledTriggers(getApplication())
         val respondersThatCanConnect = PanicTrigger.getRespondersThatCanConnect(getApplication())
 
         val pm = getApplication<Application>().packageManager
-        val apps = respondersThatCanConnect
+        val apps = allTriggers
             .filter { packageName ->
                 packageName != getApplication<Application>().packageName
             }

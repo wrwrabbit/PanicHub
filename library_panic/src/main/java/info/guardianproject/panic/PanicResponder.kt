@@ -83,7 +83,7 @@ object PanicResponder {
 
     fun isTriggerPackageNameListContains(activity: Activity, packageName: String?): Boolean {
         packageName ?: return false
-        val triggerPackageNameList = getTriggerPackageNameList(activity)
+        val triggerPackageNameList = getEnabledTriggers(activity)
         return triggerPackageNameList.contains(packageName)
     }
 
@@ -92,7 +92,7 @@ object PanicResponder {
             return
         }
 
-        val triggerPackageNameList = getTriggerPackageNameList(activity)
+        val triggerPackageNameList = getEnabledTriggers(activity)
         clearTriggerPackageNameList(activity)
         val mutableList = triggerPackageNameList.toMutableList()
         mutableList.remove(packageName)
@@ -122,7 +122,7 @@ object PanicResponder {
      * @param packageName the app to set as the panic trigger
      */
     fun addTriggerPackageName(activity: Activity, packageName: String) {
-        val triggerPackageNameList = getTriggerPackageNameList(activity)
+        val triggerPackageNameList = getEnabledTriggers(activity)
         clearTriggerPackageNameList(activity)
         val mutableList = triggerPackageNameList.toMutableList()
         mutableList.add(packageName)
@@ -168,7 +168,7 @@ object PanicResponder {
      * @param context the app's [Context]
      * @return the `packageName` or null
      */
-    fun getTriggerPackageNameList(context: Context): List<String> {
+    fun getEnabledTriggers(context: Context): List<String> {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         val list = mutableListOf<String>()
         val size = prefs.getInt(PREF_TRIGGER_PACKAGE_NAME_SIZE, 0)
@@ -304,7 +304,7 @@ object PanicResponder {
         noneSummaryResid: Int
     ) {
         val context = listPreference.context
-        val triggerPackageNameList = getTriggerPackageNameList(context).toMutableList()
+        val triggerPackageNameList = getEnabledTriggers(context).toMutableList()
         if (triggerPackageNameList.isEmpty()) {
             triggerPackageNameList.add(Panic.PACKAGE_NAME_DEFAULT)
         }

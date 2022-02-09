@@ -229,17 +229,29 @@ object PanicTrigger {
      * [Intent]s.
      *
      * @param context the app's [Context]
-     * @return the set of `packageNames` of responder apps
+     * @return the set of `packageNames` of responder apps that include [Panic.ACTION_TRIGGER]
      * @see .getResponderActivities
      * @see .getResponderBroadcastReceivers
      * @see .getResponderServices
      * @see .getEnabledResponders
+     *
+     * TRIGGER - это handler.
      */
     fun getAllResponders(context: Context): Set<String> {
         val packageNames = mutableListOf<String>()
         packageNames.addAll(getResponderActivities(context))
         packageNames.addAll(getResponderBroadcastReceivers(context))
         packageNames.addAll(getResponderServices(context))
+        return HashSet(packageNames)
+    }
+
+    /**
+     * TriggerApp  = CONNECT/DISCONNECT without TRIGGER
+     * */
+    fun getTriggerApps(context: Context): Set<String> {
+        val packageNames = mutableListOf<String>()
+        packageNames.addAll(getRespondersThatCanConnect(context))
+        packageNames.removeAll(getAllResponders(context))
         return HashSet(packageNames)
     }
 
@@ -318,19 +330,21 @@ object PanicTrigger {
      * @param context the app's [Context]
      * @return the set of `packageNames` of responder apps that can connect
      * to a trigger app
+     *
+     * TRIGGER + CONNECT/DISCONNECT - это handler, у которого есть кнопка edit.
+     * Он не будет обрабатывать триггер, если триггер к нему не подключён.
      */
     fun getRespondersThatCanConnect(context: Context): Set<String> {
-        val connectInfos = context.packageManager.queryIntentActivities(
-            PanicUtils.buildConnectIntent(), 0
-        )
-        val connectPackageNameList: MutableSet<String> = HashSet(connectInfos.size)
-        for (resolveInfo in connectInfos) {
+        val pm = context.packageManager
+        val activitiesList = pm.queryIntentActivities(PanicUtils.buildConnectIntent(), 0)
+        val activities: MutableSet<String> = HashSet(activitiesList.size)
+        for (resolveInfo in activitiesList) {
             if (resolveInfo.activityInfo == null) {
                 continue
             }
-            connectPackageNameList.add(resolveInfo.activityInfo.packageName)
+            activities.add(resolveInfo.activityInfo.packageName)
         }
-        return connectPackageNameList
+        return activities
     }
 
     fun sendTriggerWithExtras(context: Context, intent: Intent = PanicUtils.buildTriggerIntent(), extras: Bundle?) {
